@@ -12,6 +12,7 @@ public class Mappings {
 	public static final String CREATE_A_PATIENT_FORM_VIEW = "create-a-patient.jsp";
 	public static final String SHOW_PATIENT_VIEW = "show-patient.jsp";
 	public static final String SHOW_DOCTORS_PATIENTS_VIEW = "show-doctors-patients.jsp";
+	public static final String LOGIN_VIEW = "Login.jsp";
 	
 
 }

@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 
 import com.management.hospital.model.Patient;
 import com.management.hospital.service.PatientService;
+import com.management.hospital.service.Utils;
 
 
 /**
@@ -47,11 +48,12 @@ public class PatientController extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (Utils.isAuthenticated(request, response, request.getSession())) {
+
+		RequestDispatcher dispatcher = request.getRequestDispatcher(Mappings.SHOW_PATIENTS_VIEW);
 		String command = (String)request.getParameter("command");
 		String action  = (String)request.getParameter("action");
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher(Mappings.SHOW_PATIENTS_VIEW);
-		
 		if(action != null) {
 			List<Integer> doctorIds = null;
 			if(action.equals("LOAD_DOCTORS")) {
@@ -95,6 +97,11 @@ public class PatientController extends HttpServlet {
 		List<Patient> patients = patientService.findAll();
 		request.setAttribute("allPatients", patients);
 		dispatcher.forward(request, response);
+		}
+		else {
+			response.sendRedirect(Mappings.LOGIN_VIEW);
+		}
 	}
+		
 
 }
