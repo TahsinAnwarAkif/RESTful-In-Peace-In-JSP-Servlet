@@ -3,10 +3,14 @@ package com.management.hospital.service;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.management.hospital.controller.Mappings;
+import com.management.hospital.model.Patient;
 
 public class Utils {
 	public static boolean isAuthenticated(HttpServletRequest request, HttpServletResponse response,

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import com.management.hospital.model.Doctor;
-import com.management.hospital.service.DoctorDBUtil;
+import com.management.hospital.service.DoctorService;
 
 
 /**
@@ -27,7 +27,7 @@ public class DoctorController extends HttpServlet {
 	@Resource(name = Mappings.RESOURCE_NAME)
 	private DataSource dataSource;
 	
-	private DoctorDBUtil doctorDBUtil;
+	private DoctorService doctorService;
 	
 	
 
@@ -36,7 +36,7 @@ public class DoctorController extends HttpServlet {
 		// TODO Auto-generated method stub
 		super.init();
 		try {
-		doctorDBUtil = new DoctorDBUtil(dataSource);
+		doctorService = new DoctorService(dataSource);
 		}
 		catch(Exception e) {
 			throw new ServletException(e);
@@ -54,20 +54,20 @@ public class DoctorController extends HttpServlet {
 		
 		if(command != null){
 			if(command.equals("ADD"))
-				doctorDBUtil.createADoctor(request);
+				doctorService.createADoctor(request);
 			else if(command.equals("LOAD")) {
-				Doctor doctor = doctorDBUtil.findOne(request);
+				Doctor doctor = doctorService.findOne(request);
 				request.setAttribute("doctor", doctor);
 				dispatcher = request.getRequestDispatcher(Mappings.SHOW_DOCTOR_VIEW);
 			}
 			else if(command.equals("UPDATE")) {
-				doctorDBUtil.updateADoctor(request);
+				doctorService.updateADoctor(request);
 			}
 			else if(command.equals("DELETE")) {
-				doctorDBUtil.deleteADoctor(request);
+				doctorService.deleteADoctor(request);
 			}
 		}
-		List<Doctor> doctors = doctorDBUtil.findAll();
+		List<Doctor> doctors = doctorService.findAll();
 		request.setAttribute("allDoctors", doctors);
 		dispatcher.forward(request, response);
 	}

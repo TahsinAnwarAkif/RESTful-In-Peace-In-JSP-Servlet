@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Show Doctor</title>
+<title>Show Patient</title>
 </head>
 <body>
 	<form action="ShowPatients" method="GET">
@@ -16,14 +16,31 @@
 		<br /> <br /> Phone: <input type="text" name="phone"
 			value="${patient.phone }" /> <br /> <br /> Email: <input
 			type="text" name="email" value="${patient.email }" /> <br /> <br />
-		Assigned Doctor ID: <select name="doctorId">
+
+		Assigned Doctor ID: 
+		<select name="doctorId" >
 			<option value="${patient.doctorId}" selected>${patient.doctorId}</option>
+			<c:if test="${!param.alreadyDoctorSelected }">
 			<c:forEach var="doctor" items="${doctorIds}">
 				<c:if test="${doctor != patient.doctorId}">
 					<option value="${doctor}">${doctor}</option>
 				</c:if>
 			</c:forEach>
-		</select> <br /> <br /> <input type="submit" value="Submit" /> <input
-			type="button" value="Cancel" onclick="location.href='ShowPatients';" />
+			</c:if> 
+		</select>
+		
+		<br /> <br /> 
+		<c:if test="${param.alreadyDoctorSelected }">
+		<input type="hidden" name="alreadyDoctorSelected" value= "${param.alreadyDoctorSelected }"/>
+		</c:if>
+		
+		<input type="submit" value="Submit" /> 
+		<c:if test="${param.alreadyDoctorSelected }">
+		<input type="button" value="Cancel" onclick="location.href='show-doctors-patients';" />
+		</c:if>
+		<c:if test="${!param.alreadyDoctorSelected }">
+		<input type="button" value="Cancel" onclick="location.href='ShowPatients';" />
+		</c:if>
+		</form>
 </body>
 </html>

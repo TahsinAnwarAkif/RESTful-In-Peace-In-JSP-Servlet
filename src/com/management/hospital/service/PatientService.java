@@ -4,34 +4,35 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.management.hospital.controller.Mappings;
 import com.management.hospital.model.Patient;
 
-public class PatientDBUtil {
+public class PatientService {
 	
 	private DataSource dataSource;
 	
-	public PatientDBUtil(DataSource dataSource) {
+	public PatientService(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 	public List<Patient> findAll(){
 		List<Patient> patients = new ArrayList<Patient>();
 		Connection connection = null;
-		Statement  statement  = null;
+		PreparedStatement  statement  = null;
 		ResultSet  resultSet  = null;
 		try {
 			connection = dataSource.getConnection();
-			statement  = connection.createStatement();
 			String sql = "select * from patient";
-			resultSet  = statement.executeQuery(sql);
+			statement  = connection.prepareStatement(sql);
+			resultSet  = statement.executeQuery();
 			while(resultSet.next()) {
 				Patient patient = new Patient(Integer.parseInt(resultSet.getString("id")), resultSet.getString("name"),
 						resultSet.getString("address"), resultSet.getString("phone"), resultSet.getString("email"), Integer.parseInt(resultSet.getString("doctor_id")) );
@@ -50,9 +51,6 @@ public class PatientDBUtil {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Connection connection = null;
 		PreparedStatement  statement  = null;
-		Statement  statementforDoctorIds  = null;
-		ResultSet  resultSetForDoctorIds  = null;
-	
 		try {
 			connection = dataSource.getConnection();
 			String sql = " insert into patient "
@@ -79,12 +77,9 @@ public class PatientDBUtil {
 	public Map<String, Object> findOne(HttpServletRequest request) {
 		Map<String, Object> result = new HashMap<String, Object>();
 		Patient patient = null;
-		List<Integer> doctorIds = new ArrayList<Integer>();
 		Connection connection = null;
 		PreparedStatement  statement  = null;
-		Statement  statementforDoctorIds  = null;
 		ResultSet  resultSet  = null;
-		ResultSet  resultSetForDoctorIds  = null;
 		try {
 			connection = dataSource.getConnection();
 			int patientId = Integer.parseInt(request.getParameter("patientId"));
@@ -98,14 +93,6 @@ public class PatientDBUtil {
 						resultSet.getString("address"), resultSet.getString("phone"), resultSet.getString("email"),
 						Integer.parseInt(resultSet.getString("doctor_id")) );
 			}
-			//FIND THE AVAILABLE DOCTOR IDs
-			statementforDoctorIds = connection.createStatement();
-			String sqlForDoctorIds = "select id from doctor";
-			resultSetForDoctorIds  = statementforDoctorIds.executeQuery(sqlForDoctorIds);
-			
-			while(resultSetForDoctorIds.next()) {
-				doctorIds.add(resultSetForDoctorIds.getInt("id"));
-			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -114,7 +101,6 @@ public class PatientDBUtil {
 			Utils.close(connection, statement, resultSet);
 		}
 	result.put("patient", patient);
-	result.put("doctorIds", doctorIds);
 	return result;
 	}
 	public void updateAPatient(HttpServletRequest request) {
@@ -170,13 +156,13 @@ public class PatientDBUtil {
 
 		List<Integer> doctorIds = new ArrayList<Integer>();
 		Connection connection = null;
-		Statement  statementforDoctorIds  = null;
+		PreparedStatement  statementforDoctorIds  = null;
 		ResultSet  resultSetForDoctorIds  = null;
 		try {
 			connection = dataSource.getConnection();
-			statementforDoctorIds = connection.createStatement();
 			String sqlForDoctorIds = "select id from doctor";
-			resultSetForDoctorIds  = statementforDoctorIds.executeQuery(sqlForDoctorIds);
+			statementforDoctorIds = connection.prepareStatement(sqlForDoctorIds);
+			resultSetForDoctorIds  = statementforDoctorIds.executeQuery();
 			
 			while(resultSetForDoctorIds.next()) {
 				doctorIds.add(resultSetForDoctorIds.getInt("id"));
@@ -189,5 +175,41 @@ public class PatientDBUtil {
 			Utils.close(connection, statementforDoctorIds, resultSetForDoctorIds);
 		}
 	return doctorIds;
+	}
+	public List<Patient> findByDoctorId(HttpServletRequest request) {
+		List<Patient> patients = new ArrayList<Patient>();
+		Connection connection 		  = null;
+		PreparedStatement  statement  = null;
+		ResultSet			resultSet = null;
+		try {
+			//int doctorId = Integer.parseInt(request.getParameter("doctorId"));
+			connection = dataSource.getConnection();
+			String sql = "select * from patient"
+						 +" where doctor_id = ? ";
+			statement  = connection.prepareStatement(sql);
+			statement.setInt(1, Integer.parseInt(request.getParameter("doctorId")));
+			resultSet = statement.executeQuery();
+			while(resultSet.next()) {
+				Patient patient = new Patient(Integer.parseInt(resultSet.getString("id")), resultSet.getString("name"),
+						resultSet.getString("address"), resultSet.getString("phone"), resultSet.getString("email"), Integer.parseInt(resultSet.getString("doctor_id")) );
+				patients.add(patient);
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			Utils.close(connection, statement, resultSet);
+		}
+		return patients;
+	}
+	
+	public RequestDispatcher getRedirectLinkToDoctorsPatients(RequestDispatcher dispatcher, HttpServletRequest request) {
+		if(Boolean.parseBoolean(request.getParameter("alreadyDoctorSelected"))) {
+			List<Patient> patientsOfDoctor = findByDoctorId(request);
+			request.setAttribute("patientsOfDoctor", patientsOfDoctor);
+			dispatcher = request.getRequestDispatcher(Mappings.SHOW_DOCTORS_PATIENTS_VIEW);
+		}
+		return dispatcher;
 	}
 }

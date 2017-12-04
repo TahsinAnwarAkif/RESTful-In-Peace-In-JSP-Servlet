@@ -62,49 +62,43 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Show All Doctors</title>
+<title>Show All Patients</title>
 </head>
 <body>
 	<table border="1" class="tg" align="center">
 		<tr>
 			<th class="tg-xu9l">ID</th>
 			<th class="tg-s0wq">Name</th>
-			<th class="tg-e3eb">Is_Available</th>
-			<th class="tg-e3eb">Specialty</th>
 			<th class="tg-gvwu">Address</th>
 			<th class="tg-i6eq">Phone</th>
 			<th class="tg-i6eq">Email</th>
 			<th class="tg-i6eq">Update</th>
 			<th class="tg-i6eq">Delete</th>
-			<th class="tg-i6eq">Show Patients</th>
 		</tr>
-		<c:forEach var="doctor" items="${allDoctors}">
-			<c:url var="updateLink" value="ShowDoctors">
+		<c:forEach var="patient" items="${patientsOfDoctor}">
+			<c:url var="updateLink" value="ShowPatients">
 				<c:param name="command" value="LOAD"></c:param>
-				<c:param name="doctorId" value="${doctor.id}"></c:param>
+				<c:param name="action" value="LOAD_DOCTORS"></c:param>
+				<c:param name="alreadyDoctorSelected" value="true"></c:param>
+				<c:param name="patientId" value="${patient.id}"></c:param>
 			</c:url>
-			<c:url var="deleteLink" value="ShowDoctors">
+			<c:url var="deleteLink" value="ShowPatients">
 				<c:param name="command" value="DELETE"></c:param>
-				<c:param name="doctorId" value="${doctor.id}"></c:param>
-			</c:url>
-			<c:url var="showPatientsLink" value="ShowPatients">
-				<c:param name="command" value="LOAD_DOCTORS_PATIENTS"></c:param>
-				<c:param name="doctorId" value="${doctor.id}"></c:param>
+				<c:param name="doctorId" value="${param.doctorId}"></c:param>
+				<c:param name="alreadyDoctorSelected" value="true"></c:param>
+				<c:param name="patientId" value="${patient.id}"></c:param>
 			</c:url>
 			<tr>
-				<td>${doctor.id}</td>
-				<td>${doctor.name}</td>
-				<td>${doctor.specialty}</td>
-				<td>${doctor.isAvailable}</td>
-				<td>${doctor.address}</td>
-				<td>${doctor.phone}</td>
-				<td>${doctor.email}</td>
+				<td>${patient.id}</td>
+				<td>${patient.name}</td>
+				<td>${patient.address}</td>
+				<td>${patient.phone}</td>
+				<td>${patient.email}</td>
 				<td><a href= "${updateLink}">Update</a></td>
-				<td><a href= "${deleteLink}" onclick= "if(!confirm('Are you sure you want to delete this doctor?'))return false;">Delete</a></td>
-				<td><a href= "${showPatientsLink}">Show Patients</a></td>
+				<td><a href= "${deleteLink}" onclick= "if(!confirm('Are you sure you want to delete this patient?'))return false;">Delete</a></td>
 			</tr>
 		</c:forEach>
 	</table>
-	<h4><a href = "UserMenu">Go Back</a></h4>
+	<h4><a href = "ShowDoctors">Go Back</a></h4>
 </body>
 </html>

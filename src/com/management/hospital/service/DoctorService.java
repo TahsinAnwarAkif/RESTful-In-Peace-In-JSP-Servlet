@@ -3,7 +3,6 @@ package com.management.hospital.service;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,23 +11,23 @@ import javax.sql.DataSource;
 
 import com.management.hospital.model.Doctor;
 
-public class DoctorDBUtil {
+public class DoctorService {
 	
 	private DataSource dataSource;
 	
-	public DoctorDBUtil(DataSource dataSource) {
+	public DoctorService(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 	public List<Doctor> findAll(){
 		List<Doctor> doctors = new ArrayList<Doctor>();
 		Connection connection = null;
-		Statement  statement  = null;
+		PreparedStatement  statement  = null;
 		ResultSet  resultSet  = null;
 		try {
 			connection = dataSource.getConnection();
-			statement  = connection.createStatement();
 			String sql = "select * from doctor";
-			resultSet  = statement.executeQuery(sql);
+			statement  = connection.prepareStatement(sql);
+			resultSet  = statement.executeQuery();
 			while(resultSet.next()) {
 				Doctor doctor = new Doctor(Integer.parseInt(resultSet.getString("id")), resultSet.getString("name"), 
 						resultSet.getString("is_available"), resultSet.getString("specialty"), resultSet.getString("address"), 
